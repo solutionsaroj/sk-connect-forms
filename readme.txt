@@ -1,5 +1,5 @@
 === SK Connect Forms ===
-Contributors: Antigravity
+Contributors: solutionsaroj
 Tags: contact form, form builder, custom form, ajax form, forms
 Requires at least: 5.8
 Tested up to: 7.0
