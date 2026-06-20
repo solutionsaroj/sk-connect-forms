@@ -1,0 +1,527 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
+/* Main CSS variables for a premium look */
+:root {
+    --sk-connect-primary: #6366f1;         /* Sleek Indigo */
+    --sk-connect-primary-hover: #4f46e5;   /* Darker Indigo */
+    --sk-connect-primary-glow: rgba(99, 102, 241, 0.25);
+    --sk-connect-success: #10b981;         /* Emerald green */
+    --sk-connect-error: #ef4444;           /* Coral red */
+    --sk-connect-bg-glass: rgba(255, 255, 255, 0.7);
+    --sk-connect-border-glass: rgba(255, 255, 255, 0.4);
+    --sk-connect-text-main: #1e293b;       /* Dark slate */
+    --sk-connect-text-muted: #64748b;      /* Muted slate */
+    --sk-connect-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Base Wrapper styling to isolate the form styles */
+.sk-connect-form-wrapper {
+    font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: var(--sk-connect-text-main);
+    max-width: 600px;
+    margin: 2rem auto;
+    padding: 2.5rem;
+    background: var(--sk-connect-bg-glass);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--sk-connect-border-glass);
+    border-radius: 24px;
+    box-shadow: var(--sk-connect-shadow);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Subtle background accent blur inside wrapper */
+.sk-connect-form-wrapper::before {
+    content: '';
+    position: absolute;
+    top: -50px;
+    right: -50px;
+    width: 150px;
+    height: 150px;
+    background: var(--sk-connect-primary);
+    filter: blur(80px);
+    opacity: 0.15;
+    pointer-events: none;
+    border-radius: 50%;
+}
+
+.sk-connect-form-wrapper h2.sk-connect-form-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: var(--sk-connect-text-main);
+    text-align: center;
+    letter-spacing: -0.025em;
+    background: linear-gradient(135deg, var(--sk-connect-text-main) 30%, var(--sk-connect-primary) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.sk-connect-form-wrapper p.sk-connect-form-subtitle {
+    font-size: 0.95rem;
+    color: var(--sk-connect-text-muted);
+    text-align: center;
+    margin-bottom: 2.25rem;
+}
+
+/* Form Group Layout */
+.sk-connect-form-group {
+    position: relative;
+    margin-bottom: 1.75rem;
+}
+
+/* Modern Input and Textarea Styling */
+.sk-connect-form-input {
+    width: 100%;
+    padding: 1rem 1.25rem;
+    font-size: 0.95rem;
+    font-weight: 400;
+    font-family: inherit;
+    background: rgba(255, 255, 255, 0.6);
+    border: 1.5px solid rgba(226, 232, 240, 0.8);
+    border-radius: 12px;
+    color: var(--sk-connect-text-main);
+    outline: none;
+    box-sizing: border-box;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sk-connect-form-input:hover {
+    border-color: rgba(99, 102, 241, 0.4);
+}
+
+.sk-connect-form-input:focus {
+    border-color: var(--sk-connect-primary);
+    background: #ffffff;
+    box-shadow: 0 0 0 4px var(--sk-connect-primary-glow);
+}
+
+/* Floating Label Animation */
+.sk-connect-form-label {
+    position: absolute;
+    left: 1.25rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    padding: 0 0.25rem;
+    color: var(--sk-connect-text-muted);
+    font-size: 0.95rem;
+    pointer-events: none;
+    transition: all 0.2s ease;
+    transform-origin: left top;
+}
+
+/* Textarea specific spacing */
+textarea.sk-connect-form-input {
+    min-height: 120px;
+    resize: vertical;
+}
+
+textarea.sk-connect-form-input ~ .sk-connect-form-label {
+    top: 1.25rem;
+    transform: translateY(0);
+}
+
+/* Floating behavior when input is focused or not empty */
+.sk-connect-form-input:focus ~ .sk-connect-form-label,
+.sk-connect-form-input:not(:placeholder-shown) ~ .sk-connect-form-label {
+    top: -0.6rem;
+    left: 0.85rem;
+    transform: scale(0.85) translateY(0);
+    color: var(--sk-connect-primary);
+    font-weight: 600;
+    background: #ffffff;
+    padding: 0 6px;
+    border-radius: 4px;
+    z-index: 10;
+}
+
+/* Styled Select Dropdown overrides */
+select.sk-connect-form-input {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27%2364748b%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Cpolyline%20points%3D%276%209%2012%2015%2018%209%27%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1.25rem center;
+    background-size: 1rem;
+    cursor: pointer;
+    padding-right: 3rem;
+}
+
+select.sk-connect-form-input:focus ~ .sk-connect-form-label,
+select.sk-connect-form-input:valid ~ .sk-connect-form-label {
+    top: -0.6rem;
+    left: 0.85rem;
+    transform: scale(0.85) translateY(0);
+    color: var(--sk-connect-primary);
+    font-weight: 600;
+    background: #ffffff;
+    padding: 0 6px;
+    border-radius: 4px;
+    z-index: 10;
+}
+
+/* Checkbox & Radio Buttons Premium Styles */
+.sk-connect-form-group-options {
+    background: rgba(255, 255, 255, 0.4);
+    border: 1px solid rgba(226, 232, 240, 0.6);
+    border-radius: 16px;
+    padding: 1.25rem;
+    margin-bottom: 1.75rem;
+}
+
+.sk-connect-group-legend {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--sk-connect-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.75rem;
+    display: block;
+}
+
+.sk-connect-options-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.sk-connect-option-label {
+    display: flex;
+    align-items: center;
+    font-size: 0.95rem;
+    color: var(--sk-connect-text-main);
+    cursor: pointer;
+    position: relative;
+    user-select: none;
+}
+
+/* Hide standard check/radio */
+.sk-connect-option-input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+/* Custom indicator design */
+.sk-connect-checkbox-indicator,
+.sk-connect-radio-indicator {
+    height: 20px;
+    width: 20px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border: 1.5px solid #cbd5e1;
+    margin-right: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.sk-connect-checkbox-indicator {
+    border-radius: 6px;
+}
+
+.sk-connect-radio-indicator {
+    border-radius: 50%;
+}
+
+/* Hover indicator styling */
+.sk-connect-option-label:hover .sk-connect-checkbox-indicator,
+.sk-connect-option-label:hover .sk-connect-radio-indicator {
+    border-color: var(--sk-connect-primary);
+    box-shadow: 0 0 0 3px var(--sk-connect-primary-glow);
+}
+
+/* Checked styling */
+.sk-connect-option-input:checked ~ .sk-connect-checkbox-indicator {
+    background-color: var(--sk-connect-primary);
+    border-color: var(--sk-connect-primary);
+}
+
+.sk-connect-option-input:checked ~ .sk-connect-radio-indicator {
+    border-color: var(--sk-connect-primary);
+}
+
+/* Indicator marks (check/dot) */
+.sk-connect-checkbox-indicator::after {
+    content: "";
+    width: 5px;
+    height: 10px;
+    border: solid #ffffff;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg) scale(0);
+    transition: transform 0.15s cubic-bezier(0.12, 0.4, 0.29, 1.46);
+    margin-bottom: 2px;
+}
+
+.sk-connect-radio-indicator::after {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--sk-connect-primary);
+    transform: scale(0);
+    transition: transform 0.15s cubic-bezier(0.12, 0.4, 0.29, 1.46);
+}
+
+.sk-connect-option-input:checked ~ .sk-connect-checkbox-indicator::after {
+    transform: rotate(45deg) scale(1);
+}
+
+.sk-connect-option-input:checked ~ .sk-connect-radio-indicator::after {
+    transform: scale(1);
+}
+
+/* Validation styling */
+.sk-connect-form-input.sk-connect-invalid,
+.sk-connect-form-group-options.sk-connect-invalid {
+    border-color: var(--sk-connect-error);
+}
+
+.sk-connect-form-input.sk-connect-invalid:focus {
+    box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.15);
+}
+
+.sk-connect-form-input.sk-connect-invalid ~ .sk-connect-form-label {
+    color: var(--sk-connect-error);
+}
+
+.sk-connect-error-message {
+    color: var(--sk-connect-error);
+    font-size: 0.8rem;
+    margin-top: 0.35rem;
+    padding-left: 0.5rem;
+    display: none;
+    font-weight: 500;
+}
+
+.sk-connect-form-input.sk-connect-invalid ~ .sk-connect-error-message,
+.sk-connect-form-group-options.sk-connect-invalid .sk-connect-error-message {
+    display: block;
+}
+
+/* Beautiful Premium Submit Button */
+.sk-connect-submit-btn {
+    width: 100%;
+    padding: 1rem;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--sk-connect-primary) 0%, #4f46e5 100%);
+    color: #ffffff;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.2), 0 2px 4px -1px rgba(99, 102, 241, 0.1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.sk-connect-submit-btn::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 120%;
+    height: 0;
+    background: rgba(255, 255, 255, 0.15);
+    opacity: 0;
+    transform: translate(-50%, -50%) rotate(45deg);
+    transition: all 0.4s ease;
+}
+
+.sk-connect-submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.3), 0 4px 6px -2px rgba(99, 102, 241, 0.15);
+}
+
+.sk-connect-submit-btn:hover::after {
+    height: 300%;
+    opacity: 1;
+}
+
+.sk-connect-submit-btn:active {
+    transform: translateY(0);
+}
+
+.sk-connect-submit-btn:disabled {
+    background: var(--sk-connect-text-muted);
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Spinner Loader */
+.sk-connect-spinner {
+    width: 20px;
+    height: 20px;
+    border: 2.5px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: #ffffff;
+    animation: sk-connect-spin 0.8s linear infinite;
+    display: none;
+}
+
+@keyframes sk-connect-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Success Checkmark Animation container */
+.sk-connect-success-container {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 1rem 0;
+    animation: sk-connect-fade-in 0.4s ease forwards;
+}
+
+.sk-connect-checkmark {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    display: block;
+    stroke-width: 3;
+    stroke: #fff;
+    stroke-miterlimit: 10;
+    margin: 10% auto;
+    box-shadow: inset 0px 0px 0px var(--sk-connect-success);
+    animation: sk-connect-fill .4s ease-in-out .4s forwards, sk-connect-scale .3s ease-in-out .9s both;
+}
+
+.sk-connect-checkmark-circle {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    display: block;
+    stroke-width: 2;
+    stroke: var(--sk-connect-success);
+    stroke-miterlimit: 10;
+    box-shadow: inset 0px 0px 0px var(--sk-connect-success);
+    animation: sk-connect-fill .4s ease-in-out .4s forwards, sk-connect-scale .3s ease-in-out .9s both;
+}
+
+.sk-connect-checkmark-check {
+    transform-origin: 50% 50%;
+    stroke-dasharray: 48;
+    stroke-dashoffset: 48;
+    animation: sk-connect-stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
+}
+
+@keyframes sk-connect-stroke {
+    100% { stroke-dashoffset: 0; }
+}
+
+@keyframes sk-connect-scale {
+    0%, 100% { transform: none; }
+    50% { transform: scale3d(1.1, 1.1, 1); }
+}
+
+@keyframes sk-connect-fill {
+    100% { box-shadow: inset 0px 0px 0px 40px var(--sk-connect-success); }
+}
+
+.sk-connect-success-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 1.5rem 0 0.5rem 0;
+    color: var(--sk-connect-text-main);
+}
+
+.sk-connect-success-desc {
+    color: var(--sk-connect-text-muted);
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.sk-connect-feedback-general {
+    margin-top: 1rem;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    display: none;
+    animation: sk-connect-fade-in 0.3s ease;
+}
+
+.sk-connect-feedback-general.sk-connect-error {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--sk-connect-error);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    display: block;
+}
+
+@keyframes sk-connect-fade-in {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* =============================================
+   Accessibility & Motion Preferences
+   ============================================= */
+
+@media (prefers-reduced-motion: reduce) {
+    .sk-connect-form-wrapper,
+    .sk-connect-form-input,
+    .sk-connect-submit-btn,
+    .sk-connect-submit-btn::after,
+    .sk-connect-spinner,
+    .sk-connect-success-container,
+    .sk-connect-checkmark,
+    .sk-connect-checkmark-circle,
+    .sk-connect-checkmark-check,
+    .sk-connect-feedback-general,
+    .sk-connect-checkbox-indicator::after,
+    .sk-connect-radio-indicator::after,
+    .sk-connect-checkbox-indicator,
+    .sk-connect-radio-indicator {
+        transition: none !important;
+        animation: none !important;
+    }
+    
+    .sk-connect-checkmark-check {
+        stroke-dashoffset: 0;
+    }
+}
+
+/* Keyboard focus visibility */
+.sk-connect-form-input:focus-visible {
+    outline: 2px solid var(--sk-connect-primary);
+    outline-offset: 2px;
+}
+
+.sk-connect-submit-btn:focus-visible {
+    outline: 2px solid var(--sk-connect-primary);
+    outline-offset: 2px;
+}
+
+.sk-connect-option-input:focus-visible ~ .sk-connect-checkbox-indicator,
+.sk-connect-option-input:focus-visible ~ .sk-connect-radio-indicator {
+    outline: 2px solid var(--sk-connect-primary);
+    outline-offset: 2px;
+}
+
+/* High contrast mode */
+@media (forced-colors: active) {
+    .sk-connect-form-wrapper {
+        border: 2px solid currentColor;
+    }
+    .sk-connect-submit-btn {
+        border: 2px solid currentColor;
+    }
+    .sk-connect-checkbox-indicator,
+    .sk-connect-radio-indicator {
+        border: 2px solid currentColor;
+    }
+}
