@@ -3,7 +3,7 @@ Contributors: khanalsaroj083
 Tags: contact form, form builder, ajax form, custom form, email notifications
 Requires at least: 5.8
 Tested up to: 7.0
-Stable tag: 2.1.0
+Stable tag: 2.1.1
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -76,6 +76,13 @@ Yes. When you delete the plugin from the WordPress Plugins screen (not just deac
 
 == Changelog ==
 
+= 2.1.1 =
+* Fix: Resolved all WordPress Plugin Check tool warnings for WordPress.org submission compliance.
+* Fix: Normalized line endings (CRLF to LF) in all included FPDF library font files.
+* Fix: Added direct file access protection (`ABSPATH` guard) to all FPDF font files.
+* Fix: Updated `phpcs:disable`/`phpcs:enable` annotations on multi-line SQL queries to correctly suppress per-line sniff warnings.
+* Improvement: Bumped `Tested up to` value to WordPress 7.0.
+
 = 2.1.0 =
 * Security: Added capability checks to all admin AJAX handlers.
 * Security: Added JSON structure validation for form field configurations.
@@ -97,6 +104,9 @@ Yes. When you delete the plugin from the WordPress Plugins screen (not just deac
 * Initial release.
 
 == Upgrade Notice ==
+
+= 2.1.1 =
+This release resolves all Plugin Check compliance warnings required for WordPress.org submission. No functional changes — safe to update.
 
 = 2.1.0 =
 This release includes important security improvements. All users are strongly encouraged to upgrade immediately.
