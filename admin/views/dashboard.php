@@ -40,15 +40,16 @@ for ($sk_connect_i = 6; $sk_connect_i >= 0; $sk_connect_i--) {
     );
 }
 
-// Fetch the latest 5 submissions overall — table names are escaped via esc_sql(); JOIN query has no user input.
-// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-$sk_connect_latest_subs = $wpdb->get_results( // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-    "SELECT s.*, f.title as form_title 
-     FROM {$sk_connect_subs_table} s 
-     LEFT JOIN {$sk_connect_forms_table} f ON s.form_id = f.id 
-     ORDER BY s.submitted_at DESC 
+// Fetch the latest 5 submissions overall — table names are escaped via esc_sql(); no user input.
+// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+$sk_connect_latest_subs = $wpdb->get_results(
+    "SELECT s.*, f.title as form_title
+     FROM {$sk_connect_subs_table} s
+     LEFT JOIN {$sk_connect_forms_table} f ON s.form_id = f.id
+     ORDER BY s.submitted_at DESC
      LIMIT 5"
 );
+// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 ?>
 
 <div class="sk-connect-admin-wrap">
