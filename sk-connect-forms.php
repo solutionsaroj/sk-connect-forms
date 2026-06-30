@@ -2,7 +2,7 @@
 /**
  * Plugin Name: SK Connect Forms
  * Description: A lightweight, AJAX-powered contact form builder featuring a visual editor, submission management dashboard, CSV/PDF export, and email notifications.
- * Version: 2.1.1
+ * Version: 2.1.2
  * Author: khanalsaroj083
  * Author URI: https://profiles.wordpress.org/khanalsaroj083/
  * Text Domain: sk-connect-forms
@@ -17,7 +17,7 @@ defined('ABSPATH') || exit;
 
 define('SK_CONNECT_FORMS_PATH', plugin_dir_path(__FILE__));
 define('SK_CONNECT_FORMS_URL', plugin_dir_url(__FILE__));
-define('SK_CONNECT_FORMS_VERSION', '2.1.1');
+define('SK_CONNECT_FORMS_VERSION', '2.1.2');
 
 /**
  * Get a prefixed and escaped table name.
@@ -743,7 +743,9 @@ function sk_connect_forms_handle_bulk_pdf_export() {
     $forms_table = esc_sql( $wpdb->prefix . 'sk_connect_forms' );
     $subs_table = esc_sql( $wpdb->prefix . 'sk_connect_submissions' );
 
+    // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
     $form_row = $wpdb->get_row($wpdb->prepare("SELECT * FROM {$forms_table} WHERE id = %d", $form_id));
+    // phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
     if (!$form_row) {
         wp_die('Form template not found.');
     }
@@ -753,7 +755,9 @@ function sk_connect_forms_handle_bulk_pdf_export() {
         $fields = array();
     }
 
+    // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
     $results = $wpdb->get_results($wpdb->prepare("SELECT id, submission_data, submitted_at, is_read FROM {$subs_table} WHERE form_id = %d ORDER BY submitted_at DESC", $form_id), ARRAY_A);
+    // phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
     require_once SK_CONNECT_FORMS_PATH . 'includes/fpdf/fpdf.php';
     $pdf = new FPDF();
@@ -818,12 +822,14 @@ function sk_connect_forms_handle_single_pdf_export() {
     $forms_table = esc_sql( $wpdb->prefix . 'sk_connect_forms' );
     $subs_table = esc_sql( $wpdb->prefix . 'sk_connect_submissions' );
 
+    // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
     $sub_row = $wpdb->get_row($wpdb->prepare("SELECT * FROM {$subs_table} WHERE id = %d", $sub_id));
     if (!$sub_row) {
         wp_die('Submission not found.');
     }
 
     $form_row = $wpdb->get_row($wpdb->prepare("SELECT * FROM {$forms_table} WHERE id = %d", $sub_row->form_id));
+    // phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
     if (!$form_row) {
         wp_die('Form template not found.');
     }

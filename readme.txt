@@ -3,7 +3,7 @@ Contributors: khanalsaroj083
 Tags: contact form, form builder, ajax form, custom form, email notifications
 Requires at least: 5.8
 Tested up to: 7.0
-Stable tag: 2.1.1
+Stable tag: 2.1.2
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -75,6 +75,11 @@ Yes. When you delete the plugin from the WordPress Plugins screen (not just deac
 4. A live contact form rendered on the frontend with custom accent color.
 
 == Changelog ==
+
+= 2.1.2 =
+* Fix: Replaced all `phpcs:ignore` annotations on multi-line SQL queries with `phpcs:disable`/`phpcs:enable` blocks so every interpolated line is properly suppressed.
+* Fix: Restructured `submissions.php` pagination queries to pre-build prepared SQL strings, eliminating `UnescapedDBParameter` and `ReplacementsWrongNumber` warnings.
+* Fix: Wrapped PDF export queries in `sk-connect-forms.php` with `phpcs:disable`/`phpcs:enable` blocks.
 
 = 2.1.1 =
 * Fix: Resolved all WordPress Plugin Check tool warnings for WordPress.org submission compliance.

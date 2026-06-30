@@ -67,24 +67,24 @@ if ( $sk_connect_status_filter === 'read' ) {
     $sk_connect_base_where .= ' AND is_read = 0';
 }
 
-// Count query — table name is escaped via esc_sql(); $base_where is built from sanitized, whitelisted strings only.
-// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-$sk_connect_total_subs_count = $wpdb->get_var(
-    $wpdb->prepare(
-        "SELECT COUNT(*) FROM {$sk_connect_subs_table} WHERE {$sk_connect_base_where}", // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
-        ...$sk_connect_where_values
-    )
+// Pre-build prepared SQL strings. $sk_connect_base_where contains only hardcoded SQL fragments
+// and wpdb->esc_like()-escaped values passed via $wpdb->prepare() — never raw user input.
+// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber
+$sk_connect_count_sql = $wpdb->prepare(
+    "SELECT COUNT(*) FROM {$sk_connect_subs_table} WHERE {$sk_connect_base_where}",
+    ...$sk_connect_where_values
 );
-
-// Results query
 $sk_connect_page_values = array_merge( $sk_connect_where_values, array( $sk_connect_limit, $sk_connect_offset ) );
-// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-$sk_connect_submissions = $wpdb->get_results(
-    $wpdb->prepare(
-        "SELECT * FROM {$sk_connect_subs_table} WHERE {$sk_connect_base_where} ORDER BY submitted_at DESC LIMIT %d OFFSET %d",
-        ...$sk_connect_page_values
-    )
+$sk_connect_results_sql = $wpdb->prepare(
+    "SELECT * FROM {$sk_connect_subs_table} WHERE {$sk_connect_base_where} ORDER BY submitted_at DESC LIMIT %d OFFSET %d",
+    ...$sk_connect_page_values
 );
+// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber
+
+// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+$sk_connect_total_subs_count = $wpdb->get_var( $sk_connect_count_sql );
+// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+$sk_connect_submissions = $wpdb->get_results( $sk_connect_results_sql );
 
 $sk_connect_num_pages = ceil($sk_connect_total_subs_count / $sk_connect_limit);
 

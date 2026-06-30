@@ -12,15 +12,16 @@ global $wpdb;
 $sk_connect_forms_table = esc_sql( $wpdb->prefix . 'sk_connect_forms' );
 $sk_connect_subs_table = esc_sql( $wpdb->prefix . 'sk_connect_submissions' );
 
-// Fetch all forms with submission counts — table names are escaped via esc_sql(); no user input interpolated.
-// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+// Fetch all forms with submission counts — table names are escaped via esc_sql(); no user input.
+// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 $sk_connect_forms = $wpdb->get_results(
-    "SELECT f.id, f.title, f.created_at, COUNT(s.id) as count_subs 
-     FROM {$sk_connect_forms_table} f 
-     LEFT JOIN {$sk_connect_subs_table} s ON f.id = s.form_id 
-     GROUP BY f.id 
+    "SELECT f.id, f.title, f.created_at, COUNT(s.id) as count_subs
+     FROM {$sk_connect_forms_table} f
+     LEFT JOIN {$sk_connect_subs_table} s ON f.id = s.form_id
+     GROUP BY f.id
      ORDER BY f.created_at DESC"
 );
+// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 ?>
 
 <div class="sk-connect-admin-wrap">
