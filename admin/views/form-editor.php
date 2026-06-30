@@ -18,8 +18,8 @@ $sk_connect_form_fields = '[]';
 $sk_connect_form_settings = '{}';
 
 if ($sk_connect_form_id > 0) {
-    // phpcs:ignore WordPress.DB.DirectDatabaseQuery
-    $sk_connect_form_row = $wpdb->get_row($wpdb->prepare("SELECT * FROM {$sk_connect_forms_table} WHERE id = %d", $sk_connect_form_id)); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+    // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+    $sk_connect_form_row = $wpdb->get_row($wpdb->prepare("SELECT * FROM {$sk_connect_forms_table} WHERE id = %d", $sk_connect_form_id));
     if ($sk_connect_form_row) {
         $sk_connect_form_title = $sk_connect_form_row->title;
         $sk_connect_form_fields = $sk_connect_form_row->fields;

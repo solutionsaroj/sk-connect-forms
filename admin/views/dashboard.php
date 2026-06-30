@@ -12,15 +12,15 @@ global $wpdb;
 $sk_connect_forms_table = esc_sql( $wpdb->prefix . 'sk_connect_forms' );
 $sk_connect_subs_table  = esc_sql( $wpdb->prefix . 'sk_connect_submissions' );
 
-// Fetch global stats
-// phpcs:ignore WordPress.DB.DirectDatabaseQuery
-$sk_connect_total_unread = $wpdb->get_var("SELECT COUNT(*) FROM {$sk_connect_subs_table} WHERE is_read = 0"); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-// phpcs:ignore WordPress.DB.DirectDatabaseQuery
-$sk_connect_total_all_time = $wpdb->get_var("SELECT COUNT(*) FROM {$sk_connect_subs_table}"); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-// phpcs:ignore WordPress.DB.DirectDatabaseQuery
-$sk_connect_total_today = $wpdb->get_var("SELECT COUNT(*) FROM {$sk_connect_subs_table} WHERE DATE(submitted_at) = CURDATE()"); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-// phpcs:ignore WordPress.DB.DirectDatabaseQuery
-$sk_connect_total_forms = $wpdb->get_var("SELECT COUNT(*) FROM {$sk_connect_forms_table}"); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+// Fetch global stats — these are real-time counters; caching would return stale counts.
+// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+$sk_connect_total_unread = $wpdb->get_var("SELECT COUNT(*) FROM {$sk_connect_subs_table} WHERE is_read = 0");
+// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+$sk_connect_total_all_time = $wpdb->get_var("SELECT COUNT(*) FROM {$sk_connect_subs_table}");
+// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+$sk_connect_total_today = $wpdb->get_var("SELECT COUNT(*) FROM {$sk_connect_subs_table} WHERE DATE(submitted_at) = CURDATE()");
+// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+$sk_connect_total_forms = $wpdb->get_var("SELECT COUNT(*) FROM {$sk_connect_forms_table}");
 
 // Settings values (fallbacks for defaults when building new forms)
 $sk_connect_recipient_email = get_option('sk_connect_forms_recipient_email', get_option('admin_email'));
@@ -32,22 +32,22 @@ $sk_connect_chart_data = array();
 for ($sk_connect_i = 6; $sk_connect_i >= 0; $sk_connect_i--) {
     $sk_connect_date = wp_date('Y-m-d', strtotime("-$sk_connect_i days"));
     $sk_connect_date_label = wp_date('D (d M)', strtotime("-$sk_connect_i days"));
-    // phpcs:ignore WordPress.DB.DirectDatabaseQuery
-    $sk_connect_count = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM {$sk_connect_subs_table} WHERE DATE(submitted_at) = %s", $sk_connect_date)); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+    // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+    $sk_connect_count = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM {$sk_connect_subs_table} WHERE DATE(submitted_at) = %s", $sk_connect_date));
     $sk_connect_chart_data[] = array(
         'label' => $sk_connect_date_label,
         'count' => intval($sk_connect_count)
     );
 }
 
-// Fetch the latest 5 submissions overall
-// phpcs:ignore WordPress.DB.DirectDatabaseQuery
-$sk_connect_latest_subs = $wpdb->get_results(
+// Fetch the latest 5 submissions overall — table names are escaped via esc_sql(); JOIN query has no user input.
+// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+$sk_connect_latest_subs = $wpdb->get_results( // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
     "SELECT s.*, f.title as form_title 
      FROM {$sk_connect_subs_table} s 
      LEFT JOIN {$sk_connect_forms_table} f ON s.form_id = f.id 
      ORDER BY s.submitted_at DESC 
-     LIMIT 5" // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+     LIMIT 5"
 );
 ?>
 

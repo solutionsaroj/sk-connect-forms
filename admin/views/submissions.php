@@ -12,8 +12,8 @@ global $wpdb;
 $sk_connect_forms_table = esc_sql( $wpdb->prefix . 'sk_connect_forms' );
 $sk_connect_subs_table = esc_sql( $wpdb->prefix . 'sk_connect_submissions' );
 
-// phpcs:ignore WordPress.DB.DirectDatabaseQuery
-$sk_connect_forms_list = $wpdb->get_results("SELECT id, title FROM {$sk_connect_forms_table} ORDER BY title ASC"); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+$sk_connect_forms_list = $wpdb->get_results("SELECT id, title FROM {$sk_connect_forms_table} ORDER BY title ASC");
 
 if (empty($sk_connect_forms_list)) {
     echo '<div class="sk-connect-admin-wrap"><div class="sk-connect-card" style="padding:48px; text-align:center;"><p>No forms created yet. Please create a form first.</p></div></div>';
@@ -25,12 +25,12 @@ if (empty($sk_connect_forms_list)) {
 $sk_connect_selected_form_id = isset($_GET['form_id']) ? intval($_GET['form_id']) : intval($sk_connect_forms_list[0]->id);
 
 // Fetch active form details
-// phpcs:ignore WordPress.DB.DirectDatabaseQuery
-$sk_connect_active_form = $wpdb->get_row($wpdb->prepare("SELECT * FROM {$sk_connect_forms_table} WHERE id = %d", $sk_connect_selected_form_id)); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+$sk_connect_active_form = $wpdb->get_row($wpdb->prepare("SELECT * FROM {$sk_connect_forms_table} WHERE id = %d", $sk_connect_selected_form_id));
 if (!$sk_connect_active_form) {
     $sk_connect_selected_form_id = intval($sk_connect_forms_list[0]->id);
-    // phpcs:ignore WordPress.DB.DirectDatabaseQuery
-    $sk_connect_active_form = $wpdb->get_row($wpdb->prepare("SELECT * FROM {$sk_connect_forms_table} WHERE id = %d", $sk_connect_selected_form_id)); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+    // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+    $sk_connect_active_form = $wpdb->get_row($wpdb->prepare("SELECT * FROM {$sk_connect_forms_table} WHERE id = %d", $sk_connect_selected_form_id));
 }
 
 $sk_connect_form_fields = json_decode($sk_connect_active_form->fields, true);
@@ -67,19 +67,19 @@ if ( $sk_connect_status_filter === 'read' ) {
     $sk_connect_base_where .= ' AND is_read = 0';
 }
 
-// Count query
-// phpcs:ignore WordPress.DB.DirectDatabaseQuery
-$sk_connect_total_subs_count = $wpdb->get_var( // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+// Count query — table name is escaped via esc_sql(); $base_where is built from sanitized, whitelisted strings only.
+// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+$sk_connect_total_subs_count = $wpdb->get_var(
     $wpdb->prepare(
-        "SELECT COUNT(*) FROM {$sk_connect_subs_table} WHERE {$sk_connect_base_where}",
+        "SELECT COUNT(*) FROM {$sk_connect_subs_table} WHERE {$sk_connect_base_where}", // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
         ...$sk_connect_where_values
     )
 );
 
 // Results query
 $sk_connect_page_values = array_merge( $sk_connect_where_values, array( $sk_connect_limit, $sk_connect_offset ) );
-// phpcs:ignore WordPress.DB.DirectDatabaseQuery
-$sk_connect_submissions = $wpdb->get_results( // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+$sk_connect_submissions = $wpdb->get_results(
     $wpdb->prepare(
         "SELECT * FROM {$sk_connect_subs_table} WHERE {$sk_connect_base_where} ORDER BY submitted_at DESC LIMIT %d OFFSET %d",
         ...$sk_connect_page_values
@@ -89,12 +89,12 @@ $sk_connect_submissions = $wpdb->get_results( // phpcs:ignore WordPress.DB.Prepa
 $sk_connect_num_pages = ceil($sk_connect_total_subs_count / $sk_connect_limit);
 
 // Get stats for this form
-// phpcs:ignore WordPress.DB.DirectDatabaseQuery
-$sk_connect_total_all_time = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM {$sk_connect_subs_table} WHERE form_id = %d", $sk_connect_selected_form_id)); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-// phpcs:ignore WordPress.DB.DirectDatabaseQuery
-$sk_connect_total_unread = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM {$sk_connect_subs_table} WHERE form_id = %d AND is_read = 0", $sk_connect_selected_form_id)); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-// phpcs:ignore WordPress.DB.DirectDatabaseQuery
-$sk_connect_total_today = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM {$sk_connect_subs_table} WHERE form_id = %d AND DATE(submitted_at) = CURDATE()", $sk_connect_selected_form_id)); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+$sk_connect_total_all_time = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM {$sk_connect_subs_table} WHERE form_id = %d", $sk_connect_selected_form_id));
+// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+$sk_connect_total_unread = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM {$sk_connect_subs_table} WHERE form_id = %d AND is_read = 0", $sk_connect_selected_form_id));
+// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+$sk_connect_total_today = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM {$sk_connect_subs_table} WHERE form_id = %d AND DATE(submitted_at) = CURDATE()", $sk_connect_selected_form_id));
 
 // Identify the first 3 fields of the form to display in table columns
 $sk_connect_display_fields = array_slice($sk_connect_form_fields, 0, 3);

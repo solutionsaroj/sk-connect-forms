@@ -1,11 +1,12 @@
 <?php
 /**
  * Plugin Name: SK Connect Forms
- * Description: A premium, AJAX-powered contact form builder plugin featuring custom options (text, dropdowns, checkboxes, radios) and an interactive analytics dashboard.
+ * Description: A lightweight, AJAX-powered contact form builder featuring a visual editor, submission management dashboard, CSV/PDF export, and email notifications.
  * Version: 2.1.0
  * Author: khanalsaroj083
- * Author URI: https://sarojkhanal.com
+ * Author URI: https://profiles.wordpress.org/khanalsaroj083/
  * Text Domain: sk-connect-forms
+ * Domain Path: /languages
  * License: GPLv2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  *
@@ -180,8 +181,8 @@ function sk_connect_forms_enqueue_admin_assets($hook) {
         if ($form_id > 0) {
             global $wpdb;
             $forms_table = esc_sql( $wpdb->prefix . 'sk_connect_forms' );
-            // phpcs:ignore WordPress.DB.DirectDatabaseQuery
-            $form_row = $wpdb->get_row($wpdb->prepare("SELECT fields, settings FROM {$forms_table} WHERE id = %d", $form_id)); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+            $form_row = $wpdb->get_row($wpdb->prepare("SELECT fields, settings FROM {$forms_table} WHERE id = %d", $form_id));
             if ($form_row) {
                 $form_fields = $form_row->fields;
                 $form_settings = $form_row->settings;
@@ -207,28 +208,28 @@ function sk_connect_forms_shortcode_callback($atts) {
 
     $form_id = intval($args['id']);
     if ($form_id <= 0) {
-        return '<p style="color:red;">Error: Form ID is missing or invalid.</p>';
+        return '<p style="color:red;">' . esc_html__( 'Error: A valid Form ID is required.', 'sk-connect-forms' ) . '</p>';
     }
 
     global $wpdb;
     $forms_table = esc_sql( $wpdb->prefix . 'sk_connect_forms' );
-    // phpcs:ignore WordPress.DB.DirectDatabaseQuery
-    $form_row = $wpdb->get_row($wpdb->prepare("SELECT * FROM {$forms_table} WHERE id = %d", $form_id)); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+    // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+    $form_row = $wpdb->get_row($wpdb->prepare("SELECT * FROM {$forms_table} WHERE id = %d", $form_id));
 
     if (!$form_row) {
-        return '<p style="color:red;">Error: Form template not found.</p>';
+        return '<p style="color:red;">' . esc_html__( 'Error: The requested form could not be found.', 'sk-connect-forms' ) . '</p>';
     }
 
     $fields = json_decode($form_row->fields, true);
     $settings = json_decode($form_row->settings, true);
 
     if (!is_array($fields) || empty($fields)) {
-        return '<p style="color:orange;">Error: This form has no fields configured yet.</p>';
+        return '<p style="color:orange;">' . esc_html__( 'This form has no fields configured yet. Please add fields in the form editor.', 'sk-connect-forms' ) . '</p>';
     }
 
     // Settings overrides
-    $success_msg = isset($settings['success_message']) ? $settings['success_message'] : 'Message sent successfully.';
-    $submit_lbl = isset($settings['submit_label']) ? $settings['submit_label'] : 'Send Message';
+    $success_msg   = isset($settings['success_message']) ? $settings['success_message'] : __( 'Your message has been sent successfully. Thank you!', 'sk-connect-forms' );
+    $submit_lbl    = isset($settings['submit_label']) ? $settings['submit_label'] : __( 'Send Message', 'sk-connect-forms' );
     $primary_color = isset($settings['primary_color']) ? $settings['primary_color'] : '#6366f1';
     
     // Inject Custom primary colors dynamically inside form shortcode header
@@ -249,7 +250,7 @@ function sk_connect_forms_shortcode_callback($atts) {
         <!-- Form Fields -->
         <div class="sk-connect-form-body-wrapper">
             <h2 class="sk-connect-form-title"><?php echo esc_html($form_row->title); ?></h2>
-            <p class="sk-connect-form-subtitle">Please complete the fields below to send your inquiry.</p>
+            <p class="sk-connect-form-subtitle"><?php esc_html_e( 'Please complete the fields below to send your inquiry.', 'sk-connect-forms' ); ?></p>
             
             <form class="sk-connect-contact-form" autocomplete="off" data-form-id="<?php echo intval($form_id); ?>">
                 <?php foreach ($fields as $field) : 
@@ -331,7 +332,7 @@ function sk_connect_forms_shortcode_callback($atts) {
                 <circle class="sk-connect-checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
                 <path class="sk-connect-checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
             </svg>
-            <h3 class="sk-connect-success-title">Submission Success!</h3>
+            <h3 class="sk-connect-success-title"><?php esc_html_e( 'Message Sent Successfully!', 'sk-connect-forms' ); ?></h3>
             <p class="sk-connect-success-desc"><?php echo esc_html($success_msg); ?></p>
         </div>
     </div>
@@ -346,28 +347,28 @@ add_action('wp_ajax_sk_connect_submit_custom_form', 'sk_connect_forms_handle_cus
 add_action('wp_ajax_nopriv_sk_connect_submit_custom_form', 'sk_connect_forms_handle_custom_submission');
 function sk_connect_forms_handle_custom_submission() {
     if (!isset($_POST['security']) || !wp_verify_nonce(sanitize_key(wp_unslash($_POST['security'])), 'sk_connect_form_submit_nonce')) {
-        wp_send_json_error('Security validation failed.');
+        wp_send_json_error( __( 'Security verification failed. Please refresh the page and try again.', 'sk-connect-forms' ) );
     }
 
     $form_id = isset($_POST['form_id']) ? intval(wp_unslash($_POST['form_id'])) : 0;
     if ($form_id <= 0) {
-        wp_send_json_error('Invalid Form ID.');
+        wp_send_json_error( __( 'Invalid form ID. Please reload the page and try again.', 'sk-connect-forms' ) );
     }
 
     global $wpdb;
     $forms_table = esc_sql( $wpdb->prefix . 'sk_connect_forms' );
-    // phpcs:ignore WordPress.DB.DirectDatabaseQuery
-    $form_row = $wpdb->get_row($wpdb->prepare("SELECT * FROM {$forms_table} WHERE id = %d", $form_id)); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+    // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+    $form_row = $wpdb->get_row($wpdb->prepare("SELECT * FROM {$forms_table} WHERE id = %d", $form_id));
 
     if (!$form_row) {
-        wp_send_json_error('Form configuration not found.');
+        wp_send_json_error( __( 'Form configuration could not be found.', 'sk-connect-forms' ) );
     }
 
     $fields = json_decode($form_row->fields, true);
     $settings = json_decode($form_row->settings, true);
 
     if (!is_array($fields)) {
-        wp_send_json_error('Form fields are invalid.');
+        wp_send_json_error( __( 'The form field configuration is invalid.', 'sk-connect-forms' ) );
     }
 
     $submission_payload = array();
@@ -404,12 +405,12 @@ function sk_connect_forms_handle_custom_submission() {
     }
 
     if ($has_errors) {
-        wp_send_json_error('Please complete all required fields.');
+        wp_send_json_error( __( 'Please complete all required fields before submitting.', 'sk-connect-forms' ) );
     }
 
     // Insert to DB Submissions
     $subs_table = $wpdb->prefix . 'sk_connect_submissions';
-    // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+    // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
     $inserted = $wpdb->insert(
         $subs_table,
         array(
@@ -422,7 +423,7 @@ function sk_connect_forms_handle_custom_submission() {
     );
 
     if ($inserted === false) {
-        wp_send_json_error('Failed to save submission.');
+        wp_send_json_error( __( 'Your submission could not be saved. Please try again.', 'sk-connect-forms' ) );
     }
 
     // Dispatch notification email
@@ -443,11 +444,11 @@ function sk_connect_forms_handle_custom_submission() {
 add_action('wp_ajax_sk_connect_save_form_config', 'sk_connect_forms_handle_save_config');
 function sk_connect_forms_handle_save_config() {
     if (!isset($_POST['security']) || !wp_verify_nonce(sanitize_key(wp_unslash($_POST['security'])), 'sk_connect_admin_nonce')) {
-        wp_send_json_error('Security validation failed.');
+        wp_send_json_error( __( 'Security verification failed.', 'sk-connect-forms' ) );
     }
 
     if (!current_user_can('manage_options')) {
-        wp_send_json_error('Unauthorized access.');
+        wp_send_json_error( __( 'You do not have permission to perform this action.', 'sk-connect-forms' ) );
     }
 
     $id       = isset($_POST['id']) ? intval(wp_unslash($_POST['id'])) : 0;
@@ -456,17 +457,17 @@ function sk_connect_forms_handle_save_config() {
     $settings = isset($_POST['settings']) ? wp_unslash($_POST['settings']) : '{}'; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 
     if (empty($title)) {
-        wp_send_json_error('Form Name is required.');
+        wp_send_json_error( __( 'A form name is required.', 'sk-connect-forms' ) );
     }
 
     // Validate fields JSON structure
     $decoded_fields = json_decode( $fields, true );
     if ( ! is_array( $decoded_fields ) ) {
-        wp_send_json_error( 'Invalid fields configuration.' );
+        wp_send_json_error( __( 'The fields configuration is invalid. Please try again.', 'sk-connect-forms' ) );
     }
     foreach ( $decoded_fields as $field_item ) {
         if ( ! isset( $field_item['id'], $field_item['type'], $field_item['label'] ) ) {
-            wp_send_json_error( 'Each field must have an id, type, and label.' );
+            wp_send_json_error( __( 'Each field must have an ID, type, and label.', 'sk-connect-forms' ) );
         }
     }
 
@@ -475,7 +476,7 @@ function sk_connect_forms_handle_save_config() {
 
     if ($id > 0) {
         // Update Form
-        // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
         $updated = $wpdb->update(
             $forms_table,
             array(
@@ -488,11 +489,11 @@ function sk_connect_forms_handle_save_config() {
             array('%d')
         );
         if ($updated === false) {
-            wp_send_json_error('Database update failed.');
+            wp_send_json_error( __( 'The form could not be updated. Please try again.', 'sk-connect-forms' ) );
         }
     } else {
         // Create Form
-        // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
         $inserted = $wpdb->insert(
             $forms_table,
             array(
@@ -504,7 +505,7 @@ function sk_connect_forms_handle_save_config() {
             array('%s', '%s', '%s', '%s')
         );
         if ($inserted === false) {
-            wp_send_json_error('Database insert failed.');
+            wp_send_json_error( __( 'The form could not be created. Please try again.', 'sk-connect-forms' ) );
         }
     }
 
@@ -521,7 +522,7 @@ function sk_connect_forms_handle_toggle_read() {
     }
 
     if ( ! current_user_can( 'manage_options' ) ) {
-        wp_send_json_error( 'Unauthorized access.' );
+        wp_send_json_error( __( 'You do not have permission to perform this action.', 'sk-connect-forms' ) );
     }
 
     $id     = isset($_POST['id']) ? intval($_POST['id']) : 0;
@@ -535,10 +536,10 @@ function sk_connect_forms_handle_toggle_read() {
     $subs_table = esc_sql( $wpdb->prefix . 'sk_connect_submissions' );
 
     // Retrieve form ID first to query matching unread stats
-    // phpcs:ignore WordPress.DB.DirectDatabaseQuery
-    $form_id = $wpdb->get_var($wpdb->prepare("SELECT form_id FROM {$subs_table} WHERE id = %d", $id)); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+    // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+    $form_id = $wpdb->get_var($wpdb->prepare("SELECT form_id FROM {$subs_table} WHERE id = %d", $id));
 
-    // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+    // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
     $updated = $wpdb->update(
         $subs_table,
         array('is_read' => $status),
@@ -551,8 +552,8 @@ function sk_connect_forms_handle_toggle_read() {
         wp_send_json_error('Failed to update database record.');
     }
 
-    // phpcs:ignore WordPress.DB.DirectDatabaseQuery
-    $total_unread = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM {$subs_table} WHERE form_id = %d AND is_read = 0", $form_id)); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+    // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+    $total_unread = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM {$subs_table} WHERE form_id = %d AND is_read = 0", $form_id));
     wp_send_json_success(array('total_unread' => intval($total_unread)));
 }
 
@@ -566,7 +567,7 @@ function sk_connect_forms_handle_delete_submission() {
     }
 
     if ( ! current_user_can( 'manage_options' ) ) {
-        wp_send_json_error( 'Unauthorized access.' );
+        wp_send_json_error( __( 'You do not have permission to perform this action.', 'sk-connect-forms' ) );
     }
 
     $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
@@ -577,20 +578,20 @@ function sk_connect_forms_handle_delete_submission() {
     global $wpdb;
     $subs_table = esc_sql( $wpdb->prefix . 'sk_connect_submissions' );
 
-    // phpcs:ignore WordPress.DB.DirectDatabaseQuery
-    $form_id = $wpdb->get_var($wpdb->prepare("SELECT form_id FROM {$subs_table} WHERE id = %d", $id)); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+    // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+    $form_id = $wpdb->get_var($wpdb->prepare("SELECT form_id FROM {$subs_table} WHERE id = %d", $id));
 
-    // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+    // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
     $deleted = $wpdb->delete($subs_table, array('id' => $id), array('%d'));
 
     if ($deleted === false) {
         wp_send_json_error('Failed to delete database record.');
     }
 
-    // phpcs:ignore WordPress.DB.DirectDatabaseQuery
-    $total_all_time = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM {$subs_table} WHERE form_id = %d", $form_id)); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-    // phpcs:ignore WordPress.DB.DirectDatabaseQuery
-    $total_unread   = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM {$subs_table} WHERE form_id = %d AND is_read = 0", $form_id)); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+    // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+    $total_all_time = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM {$subs_table} WHERE form_id = %d", $form_id));
+    // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+    $total_unread   = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM {$subs_table} WHERE form_id = %d AND is_read = 0", $form_id));
 
     wp_send_json_success(array(
         'total_all_time' => intval($total_all_time),
@@ -608,7 +609,7 @@ function sk_connect_forms_handle_delete_form() {
     }
 
     if ( ! current_user_can( 'manage_options' ) ) {
-        wp_send_json_error( 'Unauthorized access.' );
+        wp_send_json_error( __( 'You do not have permission to perform this action.', 'sk-connect-forms' ) );
     }
 
     $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
@@ -621,11 +622,11 @@ function sk_connect_forms_handle_delete_form() {
     $subs_table = esc_sql( $wpdb->prefix . 'sk_connect_submissions' );
 
     // 1. Delete associated submissions
-    // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+    // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
     $wpdb->delete($subs_table, array('form_id' => $id), array('%d'));
 
     // 2. Delete the form template
-    // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+    // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
     $deleted = $wpdb->delete($forms_table, array('id' => $id), array('%d'));
 
     if ($deleted === false) {
@@ -645,7 +646,7 @@ function sk_connect_forms_handle_csv_export() {
     }
 
     if (!current_user_can('manage_options')) {
-        wp_die('Unauthorized access.');
+        wp_die( esc_html__( 'You do not have permission to perform this action.', 'sk-connect-forms' ) );
     }
 
     $form_id = isset($_GET['form_id']) ? intval(wp_unslash($_GET['form_id'])) : 0; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
@@ -657,8 +658,8 @@ function sk_connect_forms_handle_csv_export() {
     $forms_table = esc_sql( $wpdb->prefix . 'sk_connect_forms' );
     $subs_table = esc_sql( $wpdb->prefix . 'sk_connect_submissions' );
 
-    // phpcs:ignore WordPress.DB.DirectDatabaseQuery
-    $form_row = $wpdb->get_row($wpdb->prepare("SELECT * FROM {$forms_table} WHERE id = %d", $form_id)); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+    // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+    $form_row = $wpdb->get_row($wpdb->prepare("SELECT * FROM {$forms_table} WHERE id = %d", $form_id));
     if (!$form_row) {
         wp_die('Form template not found.');
     }
@@ -668,8 +669,8 @@ function sk_connect_forms_handle_csv_export() {
         $fields = array();
     }
 
-    // phpcs:ignore WordPress.DB.DirectDatabaseQuery
-    $results = $wpdb->get_results($wpdb->prepare("SELECT id, submission_data, submitted_at, is_read FROM {$subs_table} WHERE form_id = %d ORDER BY submitted_at DESC", $form_id), ARRAY_A); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+    // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+    $results = $wpdb->get_results($wpdb->prepare("SELECT id, submission_data, submitted_at, is_read FROM {$subs_table} WHERE form_id = %d ORDER BY submitted_at DESC", $form_id), ARRAY_A);
 
     // Build CSV header rows dynamically matching form field labels
     $headers = array('Submission ID', 'Date', 'Status');
@@ -730,7 +731,7 @@ function sk_connect_forms_handle_bulk_pdf_export() {
     }
 
     if (!current_user_can('manage_options')) {
-        wp_die('Unauthorized access.');
+        wp_die( esc_html__( 'You do not have permission to perform this action.', 'sk-connect-forms' ) );
     }
 
     $form_id = isset($_GET['form_id']) ? intval(wp_unslash($_GET['form_id'])) : 0;
@@ -805,7 +806,7 @@ function sk_connect_forms_handle_single_pdf_export() {
     }
 
     if (!current_user_can('manage_options')) {
-        wp_die('Unauthorized access.');
+        wp_die( esc_html__( 'You do not have permission to perform this action.', 'sk-connect-forms' ) );
     }
 
     $sub_id = isset($_GET['sub_id']) ? intval(wp_unslash($_GET['sub_id'])) : 0;

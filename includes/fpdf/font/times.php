@@ -1,4 +1,6 @@
 <?php
+// phpcs:disable -- Third-party FPDF font data file.
+defined('ABSPATH') || exit;
 $type = 'Core';
 $name = 'Times-Roman';
 $up = -100;

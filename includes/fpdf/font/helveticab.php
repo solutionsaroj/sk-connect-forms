@@ -1,4 +1,6 @@
 <?php
+// phpcs:disable -- Third-party FPDF font data file.
+defined('ABSPATH') || exit;
 $type = 'Core';
 $name = 'Helvetica-Bold';
 $up = -100;

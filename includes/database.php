@@ -44,9 +44,9 @@ function sk_connect_forms_create_db() {
     dbDelta($sql_forms);
     dbDelta($sql_submissions);
 
-    // If no forms exist yet, insert a default Contact Form to help the user get started
-    // phpcs:ignore WordPress.DB.DirectDatabaseQuery
-    $forms_count = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$sk_connect_forms_table} WHERE 1 = %d", 1 ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+    // If no forms exist yet, insert a default Contact Form to help the user get started.
+    // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+    $forms_count = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$sk_connect_forms_table} WHERE 1 = %d", 1 ) );
     if (intval($forms_count) === 0) {
         $default_fields = array(
             array(

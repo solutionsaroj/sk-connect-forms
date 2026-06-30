@@ -1,4 +1,5 @@
 <?php
+// phpcs:disable -- Third-party library (FPDF v1.86 by Olivier PLATHEY). Not subject to WordPress coding standards.
 /*******************************************************************************
 * FPDF                                                                         *
 *                                                                              *
