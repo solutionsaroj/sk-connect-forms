@@ -2,7 +2,7 @@
 /**
  * Plugin Name: SK Connect Forms
  * Description: A lightweight, AJAX-powered contact form builder featuring a visual editor, submission management dashboard, CSV/PDF export, and email notifications.
- * Version: 2.1.2
+ * Version: 2.1.3
  * Author: khanalsaroj083
  * Author URI: https://profiles.wordpress.org/khanalsaroj083/
  * Text Domain: sk-connect-forms
@@ -17,7 +17,7 @@ defined('ABSPATH') || exit;
 
 define('SK_CONNECT_FORMS_PATH', plugin_dir_path(__FILE__));
 define('SK_CONNECT_FORMS_URL', plugin_dir_url(__FILE__));
-define('SK_CONNECT_FORMS_VERSION', '2.1.2');
+define('SK_CONNECT_FORMS_VERSION', '2.1.3');
 
 /**
  * Get a prefixed and escaped table name.

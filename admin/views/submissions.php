@@ -81,20 +81,19 @@ $sk_connect_results_sql = $wpdb->prepare(
 );
 // phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber
 
-// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+// phpcs:disable PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
 $sk_connect_total_subs_count = $wpdb->get_var( $sk_connect_count_sql );
-// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
 $sk_connect_submissions = $wpdb->get_results( $sk_connect_results_sql );
+// phpcs:enable PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
 
 $sk_connect_num_pages = ceil($sk_connect_total_subs_count / $sk_connect_limit);
 
 // Get stats for this form
-// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 $sk_connect_total_all_time = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM {$sk_connect_subs_table} WHERE form_id = %d", $sk_connect_selected_form_id));
-// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 $sk_connect_total_unread = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM {$sk_connect_subs_table} WHERE form_id = %d AND is_read = 0", $sk_connect_selected_form_id));
-// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 $sk_connect_total_today = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM {$sk_connect_subs_table} WHERE form_id = %d AND DATE(submitted_at) = CURDATE()", $sk_connect_selected_form_id));
+// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
 // Identify the first 3 fields of the form to display in table columns
 $sk_connect_display_fields = array_slice($sk_connect_form_fields, 0, 3);
